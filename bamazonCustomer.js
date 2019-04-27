@@ -7,7 +7,7 @@ const connection = mysql.createConnection({
   host: "localhost",
   port: 3306,
   user: "root",
-  password: "",
+  password: "2Easy2Forget!",
   database: "bamazonDB"
 });
 
@@ -21,7 +21,12 @@ function start() {
   // Console.log all of the items available for sale
     // Include ids, names, and prices
   const queryString = "SELECT item_id, product_name, price FROM products"
-  const query = 
+  connection.query(queryString, function(err, products) {
+    if (err) throw err;
+    console.log(`\nITEMS FOR SALE`)
+    products.forEach(product => console.log(`Name: ${product.product_name} || ID: ${product.item_id} || Price: $${product.price}`));
+    console.log(`\n`);
+  })
 
 
 }
