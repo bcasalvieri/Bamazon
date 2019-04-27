@@ -7,7 +7,7 @@ const connection = mysql.createConnection({
   host: "localhost",
   port: 3306,
   user: "root",
-  password: "2Easy2Forget!",
+  password: "",
   database: "bamazonDB"
 });
 
@@ -26,14 +26,45 @@ function start() {
     console.log(`\nITEMS FOR SALE`)
     products.forEach(product => console.log(`Name: ${product.product_name} || ID: ${product.item_id} || Price: $${product.price}`));
     console.log(`\n`);
+    
+    // Create inquirer prompt
+      // Ask user which product they would like to buy
+      // Ask user how many units they would like to buy
+      // Confirm order
+    const allProducts = products.map(product => product.product_name);
+    
+    inquirer
+      .prompt([
+        {
+          type: "list",
+          message: "Which product would you like to buy?",
+          choices: allProducts,
+          name: "choice"
+        },
+        {
+          type: "input",
+          message: "How many would you like to buy?",
+          name: "amount",
+          validate: function(value) {
+            if (!isNaN(value)) {
+              return true;
+            }
+            return false;
+          }
+        },
+        {
+          type: "confirm",
+          message: "Would you like to place the order?",
+          name: "confirm",
+          default: true
+        }
+      ]).then(function(res) {
+        console.log(res)
+      })
   })
 
 
 }
-  // Create inquirer prompt
-    // Ask user for the id of the product they would like to buy
-    // Ask user how many units they would like to buy
-    // Confirm order
   // Select stock_quantity from database to ensure enough in stock to complete purchase
     // If not
       // Console.log "Insufficient Quantity"
