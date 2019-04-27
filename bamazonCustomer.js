@@ -20,7 +20,7 @@ connection.connect(function(err) {
 function start() {
   // Console.log all of the items available for sale
     // Include ids, names, and prices
-  const queryString = "SELECT item_id, product_name, price FROM products"
+  const queryString = "SELECT * FROM products"
   connection.query(queryString, function(err, products) {
     if (err) throw err;
     console.log(`\nITEMS FOR SALE`)
@@ -86,11 +86,9 @@ function start() {
               if (err) throw err;
               const total = chosenProduct.price * res.amount;
               console.log(`Your total is: $${total}`)
-              start();
             }
           );
         }
-
         else {
           console.log(`Insufficient Quantity!`);
           start();
