@@ -7,7 +7,7 @@ const connection = mysql.createConnection({
   host: "localhost",
   port: 3306,
   user: "root",
-  password: "Pa$$w0rd",
+  password: "",
   database: "bamazonDB"
 });
 
@@ -77,5 +77,56 @@ function viewLowInventory() {
       });
 
     start();
+  });
+};
+
+function addInventory() {
+  const queryString = "SELECT * FROM products";
+  connection.query(queryString, function(err, products) {
+    if (err) throw err;
+
+    const allProducts = products.map(product => product.product_name);
+
+    inquirer
+      .prompt([
+        {
+          type: "list",
+          message: "Which product do you want to update inventory?",
+          choices: allProducts,
+          name: "choice"
+        },
+        {
+          type: "input",
+          message: "How many units of product are you adding?",
+          name: "quantity",
+          validate: function(value) {
+            if (!isNaN(value)) {
+              return true;
+            };
+            return false;
+          } 
+        }
+      ]).then(function(res) {
+        // use array.find() method to find product you want to update inventory
+        const chosenProduct = products.find(product => product.product_name === res.choice);
+        
+        // UPDATE stock_quantity for chosen product
+        const queryString = "UPDATE products SET? WHERE ?";
+        connection.query(queryString,
+          [
+            {
+              stock_quantity: (chosenProduct.stock_quantity + parseInt(res.quantity))
+            },
+            {
+              product_name: chosenProduct.product_name
+            }
+          ],
+          function(err) {
+            if (err) throw err;
+            console.log(`\nAdd Inventory Complete!.\n`)
+            start();
+          }
+        );
+      });
   });
 };
