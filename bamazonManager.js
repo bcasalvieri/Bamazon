@@ -7,7 +7,7 @@ const connection = mysql.createConnection({
   host: "localhost",
   port: 3306,
   user: "root",
-  password: "",
+  password: "Pa$$w0rd",
   database: "bamazonDB"
 });
 
@@ -68,18 +68,19 @@ function viewProducts() {
 };
 
 function viewLowInventory() {
-  const queryString = "SELECT * FROM products"
+  const queryString = "SELECT * FROM products WHERE stock_quantity <= 5"
   connection.query(queryString, function (err, products) {
     if (err) throw err;
 
-    products.forEach(product => {
-      if (product.stock_quantity < 5) {
+    if (products.length === 0) {
+      console.log(`\nInventory Looks Good!\n`);
+    } else {
+      products.forEach(product => {
         console.log(`\nLOW INVENTORY`);
         console.log(`${product.product_name} || ID: ${product.item_id} || Price: $${product.price} || Quantity: ${product.stock_quantity}`);
         console.log(`\n`);
-      };
-    });
-
+      });
+    };
     start();
   });
 };
@@ -179,6 +180,7 @@ function addNewProduct() {
       }, function (err) {
         if (err) throw err;
         console.log(`\nADDED NEW PRODUCT!\n`);
+        start();
       });
     });
 };
