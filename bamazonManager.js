@@ -30,7 +30,8 @@ function start() {
         "View Products for Sale",
         "View Low Inventory",
         "Add to Inventory",
-        "Add New Product"
+        "Add New Product",
+        "Exit"
       ],
       name: "choice"
     }]).then(function (res) {
@@ -47,6 +48,9 @@ function start() {
           break;
         case "Add New Product":
           addNewProduct();
+          break;
+        case "Exit":
+          connection.end();
           break;
       };
     });
@@ -66,15 +70,15 @@ function viewProducts() {
 function viewLowInventory() {
   const queryString = "SELECT * FROM products"
   connection.query(queryString, function (err, products) {
-      if (err) throw err;
+    if (err) throw err;
 
-      products.forEach(product => {
-        if (product.stock_quantity < 5) {
-          console.log(`\nLOW INVENTORY`);
-          console.log(`${product.product_name} || ID: ${product.item_id} || Price: $${product.price} || Quantity: ${product.stock_quantity}`);
-          console.log(`\n`);
-        };
-      });
+    products.forEach(product => {
+      if (product.stock_quantity < 5) {
+        console.log(`\nLOW INVENTORY`);
+        console.log(`${product.product_name} || ID: ${product.item_id} || Price: $${product.price} || Quantity: ${product.stock_quantity}`);
+        console.log(`\n`);
+      };
+    });
 
     start();
   });
@@ -82,14 +86,13 @@ function viewLowInventory() {
 
 function addInventory() {
   const queryString = "SELECT * FROM products";
-  connection.query(queryString, function(err, products) {
+  connection.query(queryString, function (err, products) {
     if (err) throw err;
 
     const allProducts = products.map(product => product.product_name);
 
     inquirer
-      .prompt([
-        {
+      .prompt([{
           type: "list",
           message: "Which product do you want to update inventory?",
           choices: allProducts,
@@ -99,29 +102,28 @@ function addInventory() {
           type: "input",
           message: "How many units of product are you adding?",
           name: "quantity",
-          validate: function(value) {
+          validate: function (value) {
             if (!isNaN(value)) {
               return true;
             };
             return false;
-          } 
+          }
         }
-      ]).then(function(res) {
+      ]).then(function (res) {
         // use array.find() method to find product you want to update inventory
         const chosenProduct = products.find(product => product.product_name === res.choice);
-        
+
         // UPDATE stock_quantity for chosen product
         const queryString = "UPDATE products SET? WHERE ?";
         connection.query(queryString,
-          [
-            {
+          [{
               stock_quantity: (chosenProduct.stock_quantity + parseInt(res.quantity))
             },
             {
               product_name: chosenProduct.product_name
             }
           ],
-          function(err) {
+          function (err) {
             if (err) throw err;
             console.log(`\nAdd Inventory Complete!.\n`)
             start();
@@ -129,4 +131,54 @@ function addInventory() {
         );
       });
   });
+};
+
+function addNewProduct() {
+  // use inquirer to gather info about new product
+  inquirer
+    .prompt([{
+        type: "input",
+        message: "What is the product name?",
+        name: "productName"
+      },
+      {
+        type: "input",
+        message: "What is the department name?",
+        name: "departmentName"
+      },
+      {
+        type: "input",
+        message: "What is the price?",
+        name: "price",
+        validate: function (value) {
+          if (!isNaN(value)) {
+            return true;
+          };
+          return false;
+        }
+      },
+      {
+        type: "input",
+        message: "What is the quantity?",
+        name: "stockQuantity",
+        validate: function (value) {
+          if (!isNaN(value)) {
+            return true;
+          };
+          return false;
+        }
+      }
+    ]).then(function (res) {
+      // use INSERT INTO to add product into products table
+      const queryString = "INSERT INTO products SET ?";
+      connection.query(queryString, {
+        product_name: res.productName,
+        department_name: res.departmentName,
+        price: res.price,
+        stock_quantity: res.stockQuantity
+      }, function (err) {
+        if (err) throw err;
+        console.log(`\nADDED NEW PRODUCT!\n`);
+      });
+    });
 };
