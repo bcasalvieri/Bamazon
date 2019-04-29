@@ -7,7 +7,7 @@ const connection = mysql.createConnection({
   host: "localhost",
   port: 3306,
   user: "root",
-  password: "",
+  password: "Pa$$w0rd",
   database: "bamazonDB"
 });
 
@@ -52,4 +52,15 @@ function start() {
           break;
       };
     });
+};
+
+function viewProducts() {
+  const queryString = "SELECT * FROM products"
+  connection.query(queryString, function(err, products) {
+    if (err) throw err;
+    console.log(`\nITEMS FOR SALE`)
+    products.forEach(product => console.log(`${product.product_name} || ID: ${product.item_id} || Price: $${product.price} || Quantity: ${product.stock_quantity}`));
+    console.log(`\n`);
+    start();
+  });
 };

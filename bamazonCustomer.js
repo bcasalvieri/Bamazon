@@ -20,7 +20,7 @@ connection.connect(function(err) {
 function start() {
   // Console.log all of the items available for sale
     // Include ids, names, and prices
-  const queryString = "SELECT * FROM products"
+  const queryString = "SELECT * FROM products";
   connection.query(queryString, function(err, products) {
     if (err) throw err;
     console.log(`\nITEMS FOR SALE`)
