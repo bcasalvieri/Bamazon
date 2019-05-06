@@ -1,13 +1,14 @@
 // Import mysql & inquirer packages
 const mysql = require("mysql");
 const inquirer = require("inquirer");
+require("dotenv").config();
 
 // Connect to bamazonDB database
 const connection = mysql.createConnection({
   host: "localhost",
   port: 3306,
   user: "root",
-  password: "",
+  password: process.env.password,
   database: "bamazonDB"
 });
 
